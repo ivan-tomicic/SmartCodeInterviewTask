@@ -28,31 +28,24 @@ class Team(models.Model):
     def __str__(self):
         return self.name
 
-class PlayerPosition(models.Model):
-    POSITION_CHOICES = [
-        ('GK', 'Goalkeeper'),
-        ('CB', 'Center Back'),
-        ('LB', 'Left Full-Back'),
-        ('RB', 'Right Full-Back'),
-        ('RWB', 'Right Wing-Back'),
-        ('LWB', 'Left Wing-Back'),
-        ('CDM', 'Defensive Midfielder'),
-        ('CM', 'Centre Midfielder'),
-        ('CAM', 'Central Attacking Midfielder'),
-        ('LM', 'Left Side Midfielder'),
-        ('RM', 'Right Side Midfielder'),
-        ('LW', 'Left Winger'),
-        ('RW', 'Right Winger'),
-        ('CF', 'Centre Forward'),
-        ('RF', 'Right Side Forward'),
-        ('LF', 'Left Side Forward'),
-        ('ST', 'Striker')
-    ]
-
-    name = models.CharField(max_length=3, choices=POSITION_CHOICES, unique=True)
-
-    def __str__(self):
-        return self.get_name_display()
+class PlayerPosition(models.TextChoices):
+    GK = 'GK', 'Goalkeeper'
+    CB = 'CB', 'Center Back'
+    LB = 'LB', 'Left Full-Back'
+    RB = 'RB', 'Right Full-Back'
+    RWB = 'RWB', 'Right Wing-Back'
+    LWB = 'LWB', 'Left Wing-Back'
+    CDM = 'CDM', 'Defensive Midfielder'
+    CM = 'CM', 'Centre Midfielder'
+    CAM = 'CAM', 'Central Attacking Midfielder'
+    LM = 'LM', 'Left Side Midfielder'
+    RM = 'RM', 'Right Side Midfielder'
+    LW = 'LW', 'Left Winger'
+    RW = 'RW', 'Right Winger'
+    CF = 'CF', 'Centre Forward'
+    RF = 'RF', 'Right Side Forward'
+    LF = 'LF', 'Left Side Forward'
+    ST = 'ST', 'Striker'
 
 class Player(Person):
     jersey_number = models.PositiveIntegerField()
@@ -66,7 +59,7 @@ class Coach(Person):
 class PlayerTeam(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
-    position = models.ForeignKey(PlayerPosition, on_delete=models.PROTECT)
+    position = models.CharField(max_length=3, choices=PlayerPosition.choices)
 
     class Meta:
         unique_together = ('player', 'team')

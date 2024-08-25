@@ -1,5 +1,3 @@
-# In a new file called serializers.py in your app directory
-
 from rest_framework import serializers
 from .models import Team, Player, PlayerPosition, PlayerTeam
 
@@ -20,14 +18,13 @@ class PlayerSerializer(serializers.ModelSerializer):
 class AddPlayerToTeamSerializer(serializers.ModelSerializer):
     player = serializers.PrimaryKeyRelatedField(queryset=Player.objects.all())
     team = serializers.PrimaryKeyRelatedField(queryset=Team.objects.all())
-    position = serializers.PrimaryKeyRelatedField(queryset=PlayerPosition.objects.all())
+    position = serializers.ChoiceField(choices=PlayerPosition.choices)
 
     class Meta:
         model = PlayerTeam
         fields = ['player', 'team', 'position']
 
     def validate(self, data):
-        # Check if the player is already in a national team if this is a national team
         if data['team'].team_type == 'NATIONAL':
             if PlayerTeam.objects.filter(
                 player=data['player'],
@@ -35,3 +32,6 @@ class AddPlayerToTeamSerializer(serializers.ModelSerializer):
             ).exists():
                 raise serializers.ValidationError("A player can only be part of one national team.")
         return data
+
+    def create(self, validated_data):
+        return PlayerTeam.objects.create(**validated_data)
