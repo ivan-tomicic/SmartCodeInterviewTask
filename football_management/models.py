@@ -22,6 +22,8 @@ class Team(models.Model):
     name = models.CharField(max_length=100, unique=True)
     home_stadium = models.CharField(max_length=100)
     team_type = models.CharField(max_length=10, choices=TEAM_TYPES)
+    founded_year = models.PositiveIntegerField(null=True, blank=True)
+    country = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
@@ -35,6 +37,8 @@ class PlayerPosition(models.Model):
 class Player(Person):
     jersey_number = models.PositiveIntegerField()
     teams = models.ManyToManyField(Team, through='PlayerTeam', related_name='players')
+    height = models.PositiveIntegerField(help_text="Height in cm", null=True, blank=True)
+    market_value = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
 
 class Coach(Person):
     teams = models.ManyToManyField(Team, through='CoachTeam', related_name='coaches')
