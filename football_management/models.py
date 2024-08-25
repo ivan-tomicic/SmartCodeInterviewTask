@@ -29,10 +29,30 @@ class Team(models.Model):
         return self.name
 
 class PlayerPosition(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    POSITION_CHOICES = [
+        ('GK', 'Goalkeeper'),
+        ('CB', 'Center Back'),
+        ('LB', 'Left Full-Back'),
+        ('RB', 'Right Full-Back'),
+        ('RWB', 'Right Wing-Back'),
+        ('LWB', 'Left Wing-Back'),
+        ('CDM', 'Defensive Midfielder'),
+        ('CM', 'Centre Midfielder'),
+        ('CAM', 'Central Attacking Midfielder'),
+        ('LM', 'Left Side Midfielder'),
+        ('RM', 'Right Side Midfielder'),
+        ('LW', 'Left Winger'),
+        ('RW', 'Right Winger'),
+        ('CF', 'Centre Forward'),
+        ('RF', 'Right Side Forward'),
+        ('LF', 'Left Side Forward'),
+        ('ST', 'Striker')
+    ]
+
+    name = models.CharField(max_length=3, choices=POSITION_CHOICES, unique=True)
 
     def __str__(self):
-        return self.name
+        return self.get_name_display()
 
 class Player(Person):
     jersey_number = models.PositiveIntegerField()
