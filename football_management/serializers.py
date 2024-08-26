@@ -80,3 +80,9 @@ class AssignCoachToTeamsSerializer(serializers.Serializer):
         if len(existing_teams) != len(value):
             raise serializers.ValidationError("One or more team IDs are invalid.")
         return value
+
+
+class CoachSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Coach
+        fields = ['id', 'first_name', 'last_name', 'date_of_birth', 'nationality']

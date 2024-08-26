@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import Coach, Team, CoachTeam
-from .serializers import AssignCoachToTeamsSerializer
+from .serializers import AssignCoachToTeamsSerializer, CoachSerializer
 
 from .models import Team, Player
 from .serializers import TeamSerializer, PlayerSerializer, AddPlayerToTeamSerializer, TeamDetailSerializer
@@ -28,6 +28,14 @@ class TeamRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_update(self, serializer):
         serializer.save()
+
+class CoachListCreateView(generics.ListCreateAPIView):
+    queryset = Coach.objects.all()
+    serializer_class = CoachSerializer
+
+class CoachRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Coach.objects.all()
+    serializer_class = CoachSerializer
 
 class PlayerCreateView(generics.CreateAPIView):
     queryset = Player.objects.all()
