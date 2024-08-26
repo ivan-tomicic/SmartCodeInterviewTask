@@ -1,12 +1,13 @@
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework import generics
+from rest_framework import generics, filters
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 
 from .filters import PlayerFilter
-from django_filters import rest_framework as filters
+from django_filters import rest_framework as django_filters
 from .models import Coach, Team, CoachTeam, PlayerTeam
 from .serializers import AssignCoachToTeamsSerializer, CoachSerializer, ChangePlayerPositionSerializer, \
     FilteredPlayerSerializer, CoachDetailSerializer
@@ -15,9 +16,21 @@ from .models import Team, Player
 from .serializers import TeamSerializer, PlayerSerializer, AddPlayerToTeamSerializer, TeamDetailSerializer
 
 
+class CustomSearchFilter(filters.SearchFilter):
+    def get_search_fields(self, view, request):
+        return ['name', 'home_stadium', 'country']
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 class TeamListCreateView(generics.ListCreateAPIView):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [CustomSearchFilter, filters.OrderingFilter]
+    ordering_fields = ['name', 'founded_year', 'country']
+    search_fields = ['name', 'home_stadium', 'country']
 
     def perform_create(self, serializer):
         serializer.save()
@@ -114,7 +127,7 @@ class ChangePlayerPositionView(generics.UpdateAPIView):
 
 class FilterPlayersInTeamView(generics.ListAPIView):
     serializer_class = FilteredPlayerSerializer
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (django_filters.DjangoFilterBackend,)
     filterset_class = PlayerFilter
 
     @extend_schema(
