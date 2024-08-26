@@ -37,7 +37,11 @@ class CoachRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Coach.objects.all()
     serializer_class = CoachSerializer
 
-class PlayerCreateView(generics.CreateAPIView):
+class PlayerListCreateView(generics.ListCreateAPIView):
+    queryset = Player.objects.all()
+    serializer_class = PlayerSerializer
+
+class PlayerRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
 
