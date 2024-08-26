@@ -94,3 +94,16 @@ class ChangePlayerPositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlayerTeam
         fields = ['position']
+
+
+class FilteredPlayerSerializer(serializers.ModelSerializer):
+    position = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Player
+        fields = ['id', 'first_name', 'last_name', 'date_of_birth', 'nationality', 'jersey_number', 'position']
+
+    def get_position(self, obj):
+        team_id = self.context['view'].kwargs['team_id']
+        player_team = PlayerTeam.objects.filter(player=obj, team_id=team_id).first()
+        return player_team.position if player_team else None

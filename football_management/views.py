@@ -3,8 +3,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+
+from .filters import PlayerFilter
+from django_filters import rest_framework as filters
 from .models import Coach, Team, CoachTeam, PlayerTeam
-from .serializers import AssignCoachToTeamsSerializer, CoachSerializer, ChangePlayerPositionSerializer
+from .serializers import AssignCoachToTeamsSerializer, CoachSerializer, ChangePlayerPositionSerializer, \
+    FilteredPlayerSerializer
 
 from .models import Team, Player
 from .serializers import TeamSerializer, PlayerSerializer, AddPlayerToTeamSerializer, TeamDetailSerializer
@@ -95,3 +99,12 @@ class ChangePlayerPositionView(generics.UpdateAPIView):
             "message": f"Position updated successfully for player {instance.player.first_name} {instance.player.last_name} in team {instance.team.name}",
             "new_position": serializer.data['position']
         })
+
+class FilterPlayersInTeamView(generics.ListAPIView):
+    serializer_class = FilteredPlayerSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = PlayerFilter
+
+    def get_queryset(self):
+        team_id = self.kwargs['team_id']
+        return Player.objects.filter(teams__id=team_id).distinct()
