@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .models import Coach, Team, CoachTeam
-from .serializers import AssignCoachToTeamsSerializer, CoachSerializer
+from .models import Coach, Team, CoachTeam, PlayerTeam
+from .serializers import AssignCoachToTeamsSerializer, CoachSerializer, ChangePlayerPositionSerializer
 
 from .models import Team, Player
 from .serializers import TeamSerializer, PlayerSerializer, AddPlayerToTeamSerializer, TeamDetailSerializer
@@ -75,3 +75,23 @@ class AssignCoachToTeamsView(APIView):
             }, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChangePlayerPositionView(generics.UpdateAPIView):
+    serializer_class = ChangePlayerPositionSerializer
+
+    def get_object(self):
+        player_id = self.kwargs['player_id']
+        team_id = self.kwargs['team_id']
+        return get_object_or_404(PlayerTeam, player_id=player_id, team_id=team_id)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response({
+            "message": f"Position updated successfully for player {instance.player.first_name} {instance.player.last_name} in team {instance.team.name}",
+            "new_position": serializer.data['position']
+        })

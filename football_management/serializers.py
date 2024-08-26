@@ -86,3 +86,11 @@ class CoachSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coach
         fields = ['id', 'first_name', 'last_name', 'date_of_birth', 'nationality']
+
+
+class ChangePlayerPositionSerializer(serializers.ModelSerializer):
+    position = serializers.ChoiceField(choices=PlayerPosition.choices)
+
+    class Meta:
+        model = PlayerTeam
+        fields = ['position']
