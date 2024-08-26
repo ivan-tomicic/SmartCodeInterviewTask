@@ -2,7 +2,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 
 from .models import Team, Player
-from .serializers import TeamSerializer, PlayerSerializer, AddPlayerToTeamSerializer
+from .serializers import TeamSerializer, PlayerSerializer, AddPlayerToTeamSerializer, TeamDetailSerializer
 
 
 class TeamListCreateView(generics.ListCreateAPIView):
@@ -12,13 +12,17 @@ class TeamListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save()
 
+
 class TeamRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Team.objects.all()
-    serializer_class = TeamSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return TeamDetailSerializer
+        return TeamSerializer
 
     def perform_update(self, serializer):
         serializer.save()
-
 
 class PlayerCreateView(generics.CreateAPIView):
     queryset = Player.objects.all()

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Team, Player, PlayerPosition, PlayerTeam
+from .models import Team, Player, PlayerPosition, PlayerTeam, Coach, CoachTeam
 
 
 class TeamSerializer(serializers.ModelSerializer):
@@ -35,3 +35,36 @@ class AddPlayerToTeamSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return PlayerTeam.objects.create(**validated_data)
+
+
+class TeamDetailSerializer(serializers.ModelSerializer):
+    players = serializers.SerializerMethodField()
+    coaches = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Team
+        fields = ['id', 'name', 'home_stadium', 'team_type', 'founded_year', 'country', 'players', 'coaches']
+
+    def get_players(self, obj):
+        player_teams = PlayerTeam.objects.filter(team=obj).select_related('player')
+        return [
+            {
+                'id': pt.player.id,
+                'first_name': pt.player.first_name,
+                'last_name': pt.player.last_name,
+                'jersey_number': pt.player.jersey_number,
+                'position': pt.position
+            }
+            for pt in player_teams
+        ]
+
+    def get_coaches(self, obj):
+        coach_teams = CoachTeam.objects.filter(team=obj).select_related('coach')
+        return [
+            {
+                'id': ct.coach.id,
+                'first_name': ct.coach.first_name,
+                'last_name': ct.coach.last_name
+            }
+            for ct in coach_teams
+        ]
