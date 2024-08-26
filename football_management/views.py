@@ -10,7 +10,7 @@ from .filters import PlayerFilter
 from django_filters import rest_framework as django_filters
 from .models import Coach, Team, CoachTeam, PlayerTeam
 from .serializers import AssignCoachToTeamsSerializer, CoachSerializer, ChangePlayerPositionSerializer, \
-    FilteredPlayerSerializer, CoachDetailSerializer
+    FilteredPlayerSerializer, CoachDetailSerializer, PlayerDetailSerializer
 
 from .models import Team, Player
 from .serializers import TeamSerializer, PlayerSerializer, AddPlayerToTeamSerializer, TeamDetailSerializer
@@ -69,7 +69,11 @@ class PlayerListCreateView(generics.ListCreateAPIView):
 class PlayerRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     http_method_names = ['get', 'put', 'delete']
     queryset = Player.objects.all()
-    serializer_class = PlayerSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return PlayerDetailSerializer
+        return PlayerSerializer
 
 
 class AddPlayerToTeamView(generics.CreateAPIView):

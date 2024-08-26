@@ -18,6 +18,27 @@ class PlayerSerializer(serializers.ModelSerializer):
         fields = ['id', 'first_name', 'last_name', 'date_of_birth', 'nationality',
                   'jersey_number', 'height', 'market_value']
 
+class PlayerDetailSerializer(serializers.ModelSerializer):
+    teams = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Player
+        fields = ['id', 'first_name', 'last_name', 'date_of_birth', 'nationality',
+                  'jersey_number', 'height', 'market_value', 'teams']
+
+    @extend_schema_field(OpenApiTypes.OBJECT)
+    def get_teams(self, obj):
+        player_teams = PlayerTeam.objects.filter(player=obj).select_related('team')
+        return [
+            {
+                'id': pt.team.id,
+                'name': pt.team.name,
+                'team_type': pt.team.team_type,
+                'position': pt.position
+            }
+            for pt in player_teams
+        ]
+
 
 class AddPlayerToTeamSerializer(serializers.ModelSerializer):
     player = serializers.PrimaryKeyRelatedField(queryset=Player.objects.all())
