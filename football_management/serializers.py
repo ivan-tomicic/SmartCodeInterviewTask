@@ -94,6 +94,26 @@ class CoachSerializer(serializers.ModelSerializer):
         fields = ['id', 'first_name', 'last_name', 'date_of_birth', 'nationality']
 
 
+class CoachDetailSerializer(serializers.ModelSerializer):
+    teams = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Coach
+        fields = ['id', 'first_name', 'last_name', 'date_of_birth', 'nationality', 'teams']
+
+    @extend_schema_field(OpenApiTypes.OBJECT)
+    def get_teams(self, obj):
+        coach_teams = CoachTeam.objects.filter(coach=obj).select_related('team')
+        return [
+            {
+                'id': ct.team.id,
+                'name': ct.team.name,
+                'team_type': ct.team.team_type
+            }
+            for ct in coach_teams
+        ]
+
+
 class ChangePlayerPositionSerializer(serializers.ModelSerializer):
     position = serializers.ChoiceField(choices=PlayerPosition.choices)
 
