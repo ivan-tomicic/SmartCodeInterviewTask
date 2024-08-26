@@ -152,3 +152,36 @@ class FilterPlayersInTeamView(generics.ListAPIView):
         if team_id is not None:
             return Player.objects.filter(teams__id=team_id).distinct()
         return Player.objects.none()
+
+
+class RemoveCoachFromTeamView(APIView):
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name='coach_id', description='ID of the coach', required=True, type=int,
+                             location=OpenApiParameter.PATH),
+            OpenApiParameter(name='team_id', description='ID of the team', required=True, type=int,
+                             location=OpenApiParameter.PATH),
+        ],
+        description="Remove a coach from a specific team.",
+        responses={204: None}
+    )
+    def delete(self, request, coach_id, team_id):
+        coach_team = get_object_or_404(CoachTeam, coach_id=coach_id, team_id=team_id)
+        coach_team.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class RemovePlayerFromTeamView(APIView):
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name='player_id', description='ID of the player', required=True, type=int,
+                             location=OpenApiParameter.PATH),
+            OpenApiParameter(name='team_id', description='ID of the team', required=True, type=int,
+                             location=OpenApiParameter.PATH),
+        ],
+        description="Remove a player from a specific team.",
+        responses={204: None}
+    )
+    def delete(self, request, player_id, team_id):
+        player_team = get_object_or_404(PlayerTeam, player_id=player_id, team_id=team_id)
+        player_team.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

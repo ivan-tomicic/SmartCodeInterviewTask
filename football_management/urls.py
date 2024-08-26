@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import TeamListCreateView, TeamRetrieveUpdateDestroyView, AddPlayerToTeamView, \
     AssignCoachToTeamsView, CoachListCreateView, CoachRetrieveUpdateDestroyView, PlayerRetrieveUpdateDestroyView, \
-    PlayerListCreateView, ChangePlayerPositionView, FilterPlayersInTeamView
+    PlayerListCreateView, ChangePlayerPositionView, FilterPlayersInTeamView, RemoveCoachFromTeamView, \
+    RemovePlayerFromTeamView
 
 urlpatterns = [
     path('teams/', TeamListCreateView.as_view(), name='team-list-create'),
@@ -14,4 +15,6 @@ urlpatterns = [
     path('players/', PlayerListCreateView.as_view(), name='player-list-create'),
     path('players/<int:pk>/', PlayerRetrieveUpdateDestroyView.as_view(), name='player-detail'),
     path('players/<int:player_id>/teams/<int:team_id>/change-position/', ChangePlayerPositionView.as_view(), name='change-player-position'),
+    path('coaches/<int:coach_id>/teams/<int:team_id>/', RemoveCoachFromTeamView.as_view(), name='remove-coach-from-team'),
+    path('players/<int:player_id>/teams/<int:team_id>/', RemovePlayerFromTeamView.as_view(), name='remove-player-from-team'),
 ]
