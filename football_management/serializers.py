@@ -68,3 +68,15 @@ class TeamDetailSerializer(serializers.ModelSerializer):
             }
             for ct in coach_teams
         ]
+
+class AssignCoachToTeamsSerializer(serializers.Serializer):
+    team_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        allow_empty=False
+    )
+
+    def validate_team_ids(self, value):
+        existing_teams = Team.objects.filter(id__in=value)
+        if len(existing_teams) != len(value):
+            raise serializers.ValidationError("One or more team IDs are invalid.")
+        return value
