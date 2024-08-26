@@ -94,4 +94,6 @@ Once the server is running, you can access the Swagger UI at:
 http://127.0.0.1:8000/api/schema/swagger-ui/
 ```
 
+I have also included the export of the Postman collection as a JSON file in the root directory (Football Management API.postman_collection.json).
+
 This will provide an interactive interface to explore and test the API endpoints.
