@@ -38,6 +38,7 @@ class TeamListCreateView(generics.ListCreateAPIView):
 
 class TeamRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Team.objects.all()
+    http_method_names = ['get', 'put', 'delete']
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -54,6 +55,7 @@ class CoachListCreateView(generics.ListCreateAPIView):
 
 class CoachRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Coach.objects.all()
+    http_method_names = ['get', 'put', 'delete']
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -65,6 +67,7 @@ class PlayerListCreateView(generics.ListCreateAPIView):
     serializer_class = PlayerSerializer
 
 class PlayerRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    http_method_names = ['get', 'put', 'delete']
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
 
