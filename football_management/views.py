@@ -1,3 +1,4 @@
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -62,6 +63,11 @@ class AddPlayerToTeamView(generics.CreateAPIView):
 
 
 class AssignCoachToTeamsView(APIView):
+    @extend_schema(
+        request=AssignCoachToTeamsSerializer,
+        responses={201: dict},
+        description="Assign a coach to multiple teams."
+    )
     def post(self, request, coach_id):
         coach = get_object_or_404(Coach, id=coach_id)
         serializer = AssignCoachToTeamsSerializer(data=request.data)
@@ -83,6 +89,7 @@ class AssignCoachToTeamsView(APIView):
 
 class ChangePlayerPositionView(generics.UpdateAPIView):
     serializer_class = ChangePlayerPositionSerializer
+    http_method_names = ['put']
 
     def get_object(self):
         player_id = self.kwargs['player_id']
@@ -105,6 +112,25 @@ class FilterPlayersInTeamView(generics.ListAPIView):
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = PlayerFilter
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name='team_id', description='ID of the team', required=True, type=int,
+                             location=OpenApiParameter.PATH),
+            OpenApiParameter(name='nationality', description='Comma-separated list of nationalities', required=False,
+                             type=str),
+            OpenApiParameter(name='position', description='Comma-separated list of positions', required=False,
+                             type=str),
+        ],
+        description='Retrieve a list of players in a team, with optional filtering by nationality and position.',
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
     def get_queryset(self):
-        team_id = self.kwargs['team_id']
-        return Player.objects.filter(teams__id=team_id).distinct()
+        if getattr(self, 'swagger_fake_view', False):
+            # just to remove the warning from drf-spectacular
+            return Player.objects.none()
+        team_id = self.kwargs.get('team_id')
+        if team_id is not None:
+            return Player.objects.filter(teams__id=team_id).distinct()
+        return Player.objects.none()

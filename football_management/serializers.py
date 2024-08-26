@@ -1,3 +1,7 @@
+from typing import List, Dict, Optional
+
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from .models import Team, Player, PlayerPosition, PlayerTeam, Coach, CoachTeam
 
@@ -45,7 +49,8 @@ class TeamDetailSerializer(serializers.ModelSerializer):
         model = Team
         fields = ['id', 'name', 'home_stadium', 'team_type', 'founded_year', 'country', 'players', 'coaches']
 
-    def get_players(self, obj):
+    @extend_schema_field(OpenApiTypes.OBJECT)
+    def get_players(self, obj) -> List[Dict[str, any]]:
         player_teams = PlayerTeam.objects.filter(team=obj).select_related('player')
         return [
             {
@@ -58,7 +63,8 @@ class TeamDetailSerializer(serializers.ModelSerializer):
             for pt in player_teams
         ]
 
-    def get_coaches(self, obj):
+    @extend_schema_field(OpenApiTypes.OBJECT)
+    def get_coaches(self, obj) -> List[Dict[str, any]]:
         coach_teams = CoachTeam.objects.filter(team=obj).select_related('coach')
         return [
             {
@@ -103,7 +109,8 @@ class FilteredPlayerSerializer(serializers.ModelSerializer):
         model = Player
         fields = ['id', 'first_name', 'last_name', 'date_of_birth', 'nationality', 'jersey_number', 'position']
 
-    def get_position(self, obj):
+    @extend_schema_field(OpenApiTypes.STR)
+    def get_position(self, obj) -> Optional[str]:
         team_id = self.context['view'].kwargs['team_id']
         player_team = PlayerTeam.objects.filter(player=obj, team_id=team_id).first()
         return player_team.position if player_team else None
